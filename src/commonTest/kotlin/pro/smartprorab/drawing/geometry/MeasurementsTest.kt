@@ -61,10 +61,10 @@ class MeasurementsTest {
 
     @Test
     fun `таблица сторон и углов`() {
-        val rows = rectCw.sideAndAngles()
+        val rows = rectCw.sidesAndAngles()
 
         assertEquals(listOf("AB", "BC", "CD", "DA"), rows.map { it.label })
-        assertEquals(listOf(5_600, 3_230, 5_600, 3_230), rows.map { it.lengthMM })
+        assertEquals(listOf(5_600, 3_230, 5_600, 3_230), rows.map { it.lengthMm })
         assertEquals(List(4) { 90.0 }, rows.map { it.angleDeg })
     }
 }

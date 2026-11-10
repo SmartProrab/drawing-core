@@ -7,7 +7,7 @@ import kotlin.math.hypot
 import kotlin.math.roundToInt
 
 /** Строка таблицы размеров: сторона от вершины i к следующей, угол — внутренний, в её начальной вершине. */
-data class SideRow(val label: String, val lengthMM: Int, val angleDeg: Double)
+data class SideRow(val label: String, val lengthMm: Int, val angleDeg: Double)
 
 fun vertexLabel(index: Int): String {
     require(index >= 0)
@@ -48,13 +48,13 @@ fun Contour.interiorAnglesDeg(): List<Double> {
     }
 }
 
-fun Contour.sideAndAngles(): List<SideRow> {
+fun Contour.sidesAndAngles(): List<SideRow> {
     val lengths = sideLengthsMm()
     val angles = interiorAnglesDeg()
     return points.indices.map { i ->
         SideRow(
             label = vertexLabel(i) + vertexLabel((i + 1) % points.size),
-            lengthMM = lengths[i],
+            lengthMm = lengths[i],
             angleDeg = angles.getOrElse(i) { 0.0 }
         )
     }
