@@ -1,25 +1,24 @@
-package ru.lubimobile.drawing.convertor
+package pro.smartprorab.drawing.legacy
 
-import ru.lubimobile.drawing.domain.Contour
-import ru.lubimobile.drawing.domain.Drawing
-import ru.lubimobile.drawing.domain.Point
-import ru.lubimobile.drawing.dto.RoomMeasure
-import ru.lubimobile.drawing.fixtures.FixtureTag
-import ru.lubimobile.drawing.fixtures.MeasureFixtures
-import ru.lubimobile.drawing.fixtures.decodeFixture
-import ru.lubimobile.drawing.fixtures.fixtureJson
+import pro.smartprorab.drawing.model.Contour
+import pro.smartprorab.drawing.model.Drawing
+import pro.smartprorab.drawing.model.Point
+import pro.smartprorab.drawing.fixtures.FixtureTag
+import pro.smartprorab.drawing.fixtures.MeasureFixtures
+import pro.smartprorab.drawing.fixtures.decodeFixture
+import pro.smartprorab.drawing.fixtures.fixtureJson
 import kotlin.math.roundToLong
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 /**
- * Маппинг формат хранения ↔ доменная модель: обратимость на реальных чертежах,
+ * Маппинг формат SP ↔ модель: обратимость на реальных чертежах,
  * пересчёт площади и периметра, итог комнаты, сквозные поля.
  */
 class MappingTest {
 
-    private fun RoomMeasure.roundTrip(): RoomMeasure = toDrawing().toRoomMeasure()
+    private fun RoomMeasure.roundTrip(): RoomMeasure = toDrawing().toRoomMeasure(roomId, ver)
 
     @Test
     fun `точки и диагонали переживают цикл туда и обратно на всех чертежах`() {
@@ -66,10 +65,10 @@ class MappingTest {
     @Test
     fun `итог комнаты — сумма десятых без накопления погрешности double`() {
         // 0,1 + 0,2 в double — 0,30000000000000004
-        val c01 = Contour(listOf(Point(0, 0), Point(100, 0), Point(100, 1_000), Point(0, 1_000)), emptyList())
-        val c02 = Contour(listOf(Point(0, 0), Point(200, 0), Point(200, 1_000), Point(0, 1_000)), emptyList())
+        val c01 = Contour(listOf(Point(0, 0), Point(100, 0), Point(100, 1_000), Point(0, 1_000)))
+        val c02 = Contour(listOf(Point(0, 0), Point(200, 0), Point(200, 1_000), Point(0, 1_000)))
 
-        val dto = Drawing(roomId = 1, contours = listOf(c01, c02), ver = 7).toRoomMeasure()
+        val dto = Drawing(listOf(c01, c02)).toRoomMeasure(roomId = 1, ver = 7)
 
         assertEquals(0.1, dto.measure[0].area)
         assertEquals(0.2, dto.measure[1].area)
@@ -77,13 +76,15 @@ class MappingTest {
     }
 
     @Test
-    fun `версия и диагонали проходят без изменений`() {
-        val contour = Contour(listOf(Point(0, 0), Point(1_000, 0), Point(1_000, 1_000)), listOf("AC"))
+    fun `версия проходит без изменений, диагонали SP не переносятся`() {
+        val legacy = Measure(points = listOf(listOf(0.0, 0.0), listOf(0.0, 100.0), listOf(100.0, 100.0)), diagonals = listOf("AC"), area = 0.5, perimeter = 3.4)
 
-        val back = Drawing(roomId = 5, contours = listOf(contour), ver = 42).toRoomMeasure().toDrawing()
+        val contour = legacy.toContour()
+        val back = Drawing(listOf(contour)).toRoomMeasure(roomId = 5, ver = 42)
 
         assertEquals(42L, back.ver)
-        assertEquals(listOf("AC"), back.contours.single().diagonals)
+        assertEquals(5, back.roomId)
+        assertEquals(emptyList(), back.measure.single().diagonals)
     }
 
     @Test
@@ -92,7 +93,6 @@ class MappingTest {
         val dto = decodeFixture(fixture)
 
         assertNull(dto.ver)
-        assertNull(dto.toDrawing().ver)
         assertNull(dto.roundTrip().ver)
     }
 

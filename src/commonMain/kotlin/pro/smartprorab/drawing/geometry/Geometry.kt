@@ -1,6 +1,7 @@
-package ru.lubimobile.drawing.geometry
+package pro.smartprorab.drawing.geometry
 
-import ru.lubimobile.drawing.domain.Contour
+import pro.smartprorab.drawing.model.Contour
+import pro.smartprorab.drawing.model.Drawing
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.roundToLong
@@ -13,7 +14,7 @@ private const val TENTH_M_IN_MM = 100.0
 /**
  * Удвоенная знаковая площадь по формуле Гаусса, мм². Точная, без округления.
  * > 0 — обход против часовой стрелки, < 0 — по часовой (x вправо, y вверх).
- * Нормализованный обход web — по часовой: у сохранённых контуров значение < 0.
+ * Нормализованный обход — по часовой: у сохранённых контуров значение < 0.
  * Замыкание неявное: последняя вершина соединяется с первой.
  */
 fun Contour.twiceSignedAreaMm2(): Long {
@@ -21,7 +22,7 @@ fun Contour.twiceSignedAreaMm2(): Long {
     for (i in points.indices) {
         val a = points[i]
         val b = points[(i + 1) % points.size]
-        sum += a.xMm * b.yMm - b.xMm * a.yMm
+        sum += a.x.toLong() * b.y - b.x.toLong() * a.y
     }
     return sum
 }
@@ -37,7 +38,7 @@ fun Contour.perimeterMm(): Double {
     for (i in points.indices) {
         val a = points[i]
         val b = points[(i + 1) % points.size]
-        sum += hypot((b.xMm - a.xMm).toDouble(), (b.yMm - a.yMm).toDouble())
+        sum += hypot((b.x - a.x).toDouble(), (b.y - a.y).toDouble())
     }
     return sum
 }
@@ -45,3 +46,12 @@ fun Contour.perimeterMm(): Double {
 /** Периметр в десятых м, half-up. */
 fun Contour.perimeterTenthsM(): Long =
     (perimeterMm() / TENTH_M_IN_MM).roundToLong()
+
+/**
+ * Площадь чертежа в десятых м² — **сумма округлённых** площадей контуров:
+ * так её видит пользователь у каждого контура, и итог не расходится с суммой на экране.
+ */
+fun Drawing.areaTenthsM2(): Long = contours.sumOf { it.areaTenthsM2() }
+
+/** Периметр чертежа в десятых м — сумма округлённых периметров контуров. */
+fun Drawing.perimeterTenthsM(): Long = contours.sumOf { it.perimeterTenthsM() }

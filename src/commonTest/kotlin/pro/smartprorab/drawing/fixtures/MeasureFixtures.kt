@@ -1,4 +1,4 @@
-package ru.lubimobile.drawing.fixtures
+package pro.smartprorab.drawing.fixtures
 
 /**
  * Реальные чертежи из `rv_measure` (выгрузка 23.10.2026, #3).
