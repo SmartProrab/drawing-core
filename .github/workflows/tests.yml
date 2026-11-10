@@ -1,0 +1,67 @@
+# Тесты общих векторов на jvm (backend), js (web, Node.js) и Android host (мобилка).
+# iOS — вручную или при выпуске: минута macOS-раннера дороже.
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  unit-tests:
+    name: Unit tests (jvm, js, Android host)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Register Kotlin problem matcher
+        run: echo "::add-matcher::.github/matchers/kotlin.json"
+
+      - name: Run tests
+        id: tests
+        run: |
+          set -o pipefail
+          ./gradlew jvmTest jsNodeTest testAndroidHostTest jsBrowserProductionLibraryDistribution --continue --stacktrace 2>&1 | tee gradle-output.log
+
+      - name: Report Gradle failure
+        if: failure() && steps.tests.outcome == 'failure'
+        run: |
+          block=$(awk '/What went wrong/{f=1} f{print} /^\* Try:/{f=0}' gradle-output.log | head -n 80)
+          if [ -z "$block" ]; then block=$(tail -n 60 gradle-output.log); fi
+          msg=$(printf '%s' "$block" | sed -e 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::error title=Gradle build failed::${msg}"
+
+      - name: npm package contents
+        if: success()
+        run: |
+          ls -la build/dist/js/productionLibrary
+          echo "::notice title=JS bundle::$(du -sh build/dist/js/productionLibrary | cut -f1), .d.ts: $(ls build/dist/js/productionLibrary/*.d.ts 2>/dev/null | xargs -n1 basename | tr '\n' ' ')"
+
+      - name: Publish test report
+        if: always()
+        uses: mikepenz/action-junit-report@v5
+        with:
+          check_name: Unit tests
+          report_paths: '**/build/test-results/**/TEST-*.xml'
+          detailed_summary: true
+          include_passed: false
+          require_tests: false

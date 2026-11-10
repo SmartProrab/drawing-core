@@ -1,0 +1,16 @@
+[versions]
+# Как в kmp-mobile-app; apiVersion/languageVersion = 2.3 — для backend smart_3 (Kotlin 2.3.20)
+kotlin = "2.4.20"
+agp = "9.1.1"
+android-minSdk = "24"
+android-compileSdk = "37"
+kotlinx-serialization = "1.11.0"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+[plugins]
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
