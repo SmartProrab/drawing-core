@@ -5,7 +5,7 @@ enum class ContourIssue { TOO_FEW_POINTS, TOO_MANY_POINTS, ZERO_AREA, SELF_INTER
 enum class DrawingIssue { NO_CONTOURS, TOO_MANY_CONTOURS }
 
 /** Проблемы чертежа: общие + по каждому контуру (индекс → проблемы). Пусто — можно сохранять. */
-data class DrawValidation(
+data class DrawingValidation(
     val drawing: Set<DrawingIssue>,
     val contours: Map<Int, Set<ContourIssue>>
 ) {

@@ -21,7 +21,7 @@ fun Contour.validate(): Set<ContourIssue> = buildSet {
 }
 
 
-fun Drawing.validate(): DrawValidation = DrawValidation(
+fun Drawing.validate(): DrawingValidation = DrawingValidation(
     drawing = buildSet {
         if (contours.isEmpty()) add(DrawingIssue.NO_CONTOURS)
         if (contours.size > DrawingLimits.MAX_CONTOURS) add(DrawingIssue.TOO_MANY_CONTOURS)
