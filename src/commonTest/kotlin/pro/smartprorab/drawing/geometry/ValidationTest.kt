@@ -29,7 +29,8 @@ class ValidationTest {
 
     @Test
     fun `DC-VAL-01 бабочка — самопересечение`() {
-        val butterfly = contour(0 to 0, 1_000 to 1_000, 1_000 to 0, 0 to 1_000)
+        // несимметричная: у симметричной ещё и нулевая знаковая площадь
+        val butterfly = contour(0 to 0, 3_000 to 1_000, 3_000 to 0, 0 to 2_000)
 
         assertEquals(setOf(ContourIssue.SELF_INTERSECTION), butterfly.validate())
     }
@@ -99,7 +100,7 @@ class ValidationTest {
 
     @Test
     fun `проблемы контуров — по индексу, исправные не попадают`() {
-        val butterfly = contour(0 to 0, 1_000 to 1_000, 1_000 to 0, 0 to 1_000)
+        val butterfly = contour(0 to 0, 3_000 to 1_000, 3_000 to 0, 0 to 2_000)
 
         val v = Drawing(listOf(rect, butterfly)).validate()
 
