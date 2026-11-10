@@ -1,11 +1,13 @@
-package ru.lubimobile.drawing.geometry
+package pro.smartprorab.drawing.geometry
 
-import ru.lubimobile.drawing.domain.Contour
-import ru.lubimobile.drawing.domain.Point
-import ru.lubimobile.drawing.fixtures.FixtureTag
-import ru.lubimobile.drawing.fixtures.MeasureFixtures
-import ru.lubimobile.drawing.fixtures.decodeFixture
-import ru.lubimobile.drawing.convertor.toDrawing
+import pro.smartprorab.drawing.model.Contour
+import pro.smartprorab.drawing.model.ContourType
+import pro.smartprorab.drawing.model.Drawing
+import pro.smartprorab.drawing.model.Point
+import pro.smartprorab.drawing.fixtures.FixtureTag
+import pro.smartprorab.drawing.fixtures.MeasureFixtures
+import pro.smartprorab.drawing.fixtures.decodeFixture
+import pro.smartprorab.drawing.legacy.toDrawing
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -16,11 +18,11 @@ import kotlin.test.assertTrue
  */
 class GeometryTest {
 
-    private fun contour(vararg mm: Pair<Long, Long>) =
-        Contour(points = mm.map { (x, y) -> Point(xMm = x, yMm = y) }, diagonals = emptyList())
+    private fun contour(vararg mm: Pair<Int, Int>) =
+        Contour(points = mm.map { (x, y) -> Point(x = x, y = y) })
 
     /** Прямоугольник от начала координат, обход против часовой. */
-    private fun rect(wMm: Long, hMm: Long) = contour(0L to 0L, wMm to 0L, wMm to hMm, 0L to hMm)
+    private fun rect(wMm: Int, hMm: Int) = contour(0 to 0, wMm to 0, wMm to hMm, 0 to hMm)
 
     @Test
     fun `площадь и периметр прямоугольника`() {
@@ -41,7 +43,7 @@ class GeometryTest {
     @Test
     fun `площадь чуть меньше половины округляется вниз`() {
         // 49 999 мм² = 0,049999 м²
-        assertEquals(0L, contour(0L to 0L, 49_999L to 0L, 49_999L to 1L, 0L to 1L).areaTenthsM2())
+        assertEquals(0L, contour(0 to 0, 49_999 to 0, 49_999 to 1, 0 to 1).areaTenthsM2())
     }
 
     @Test
@@ -53,13 +55,13 @@ class GeometryTest {
     @Test
     fun `периметр учитывает замыкающую сторону и наклонные стороны`() {
         // треугольник 3-4-5 м
-        assertEquals(120L, contour(0L to 0L, 3_000L to 0L, 0L to 4_000L).perimeterTenthsM())
+        assertEquals(120L, contour(0 to 0, 3_000 to 0, 0 to 4_000).perimeterTenthsM())
     }
 
     @Test
     fun `знак удвоенной площади отражает направление обхода`() {
         val ccw = rect(1_000, 1_000)
-        val cw = Contour(points = ccw.points.reversed(), diagonals = emptyList())
+        val cw = Contour(points = ccw.points.reversed())
 
         assertEquals(2_000_000L, ccw.twiceSignedAreaMm2())
         assertEquals(-2_000_000L, cw.twiceSignedAreaMm2())
@@ -69,8 +71,8 @@ class GeometryTest {
     @Test
     fun `пустой, одноточечный и двухточечный контуры не падают и дают нулевую площадь`() {
         val empty = contour()
-        val single = contour(100L to 100L)
-        val segment = contour(0L to 0L, 10L to 0L)
+        val single = contour(100 to 100)
+        val segment = contour(0 to 0, 10 to 0)
 
         assertEquals(0L, empty.twiceSignedAreaMm2())
         assertEquals(0L, empty.perimeterTenthsM())
@@ -123,6 +125,22 @@ class GeometryTest {
             val c = decodeFixture(fixture).toDrawing().contours.single()
             assertTrue(c.twiceSignedAreaMm2() < 0, "комната ${fixture.roomId}")
         }
+    }
+
+    @Test
+    fun `площадь и периметр чертежа — сумма округлённых значений контуров`() {
+        // 0,05 м² + 0,05 м² — по контурам 0,1 + 0,1, итог 0,2, а не round(0,1) = 0,1
+        val half = rect(100, 500)
+        val drawing = Drawing(listOf(half, half))
+
+        assertEquals(1L, half.areaTenthsM2())
+        assertEquals(2L, drawing.areaTenthsM2())
+        assertEquals(half.perimeterTenthsM() * 2, drawing.perimeterTenthsM())
+    }
+
+    @Test
+    fun `тип контура по умолчанию — MAIN`() {
+        assertEquals(ContourType.MAIN, rect(1_000, 1_000).type)
     }
 
     private fun Long.sign(): Int = compareTo(0L)
