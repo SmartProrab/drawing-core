@@ -49,7 +49,7 @@ fun Contour.sideDirectionDeg(i: Int): Double {
  */
 fun List<SideInput>.reversedWalk(): List<SideInput> = indices.map { j ->
     SideInput(
-        angleDeg = this[if (j == 0) 0 else size - 1].angleDeg,
+        angleDeg = this[if (j == 0) 0 else size - j].angleDeg,
         lengthMm = this[size - 1 - j].lengthMm
     )
 }
@@ -70,7 +70,6 @@ private fun autoClose(rows: List<SideInput>, start: Point, dir0: Double): BuildR
 
     val angles = rows.map { it.angleDeg }
     val vertices = traverse(start, dir0, angles, rows.map { it.lengthMm.toDouble() })
-        .dropLast(0) // n−1 сторон дают n вершин: последняя замыкается на A неявно
 
     return BuildResult(
         contour = Contour(vertices.map { it.rounded() }),
