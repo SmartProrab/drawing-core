@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalJsExport::class)
+@file:JsExport
 package pro.smartprorab.drawing.js
 
 /*
