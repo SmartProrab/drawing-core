@@ -30,7 +30,7 @@ dc.validate(rect)                   // [] — можно сохранять, и�
 dc.build([[90, 3230], [90, 5600], [90, 3230]], "AUTO_CLOSE", 0, 0, 0).points
 const moved = dc.moveVertex(rect, 2, 3240.3, 5650.4, 10, 3, true)
 moved.snaps                         // ["PREV_HORIZONTAL", "NEXT_VERTICAL"] — направляющие
-dc.deleteVertex(triangle, 0)        // null — меньше 3 вершин нельзя
+dc.deleteVertex([[0, 0], [0, 1000], [1000, 0]], 0)  // null — меньше 3 вершин нельзя
 ```
 
 - Значений по умолчанию нет (сетка 10 мм, допуск 3° задаёт обёртка web-клиента).
