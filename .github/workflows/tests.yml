@@ -65,8 +65,6 @@ jobs:
       - name: TypeScript check and Node smoke test
         if: success()
         run: |
-          cat build/dist/js/productionLibrary/package.json
-          cat build/dist/js/productionLibrary/drawing-core.d.mts
           npx --yes -p typescript@5.9.3 tsc -p ts-check
           node ts-check/smoke.mjs
 
