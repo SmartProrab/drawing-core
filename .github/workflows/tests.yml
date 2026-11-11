@@ -54,7 +54,7 @@ jobs:
         if: success()
         run: |
           ls -la build/dist/js/productionLibrary
-          echo "::notice title=JS bundle::$(du -sh build/dist/js/productionLibrary | cut -f1), .d.ts: $(ls build/dist/js/productionLibrary/*.d.ts 2>/dev/null | xargs -n1 basename | tr '\n' ' ')"
+          echo "::notice title=JS bundle::$(du -sh build/dist/js/productionLibrary | cut -f1), .d.ts: $(ls build/dist/js/productionLibrary/*.d.*ts 2>/dev/null | xargs -n1 basename | tr '\n' ' ')"
 
       - uses: actions/setup-node@v4
         if: success()
