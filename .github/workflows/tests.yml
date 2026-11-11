@@ -56,6 +56,18 @@ jobs:
           ls -la build/dist/js/productionLibrary
           echo "::notice title=JS bundle::$(du -sh build/dist/js/productionLibrary | cut -f1), .d.ts: $(ls build/dist/js/productionLibrary/*.d.ts 2>/dev/null | xargs -n1 basename | tr '\n' ' ')"
 
+      - uses: actions/setup-node@v4
+        if: success()
+        with:
+          node-version: 22
+
+      # .d.ts фасада — так его увидит web-клиент; затем ES-модуль запускается в Node
+      - name: TypeScript check and Node smoke test
+        if: success()
+        run: |
+          npx --yes -p typescript@5.9.3 tsc -p ts-check
+          node ts-check/smoke.mjs
+
       - name: Publish test report
         if: always()
         uses: mikepenz/action-junit-report@v5
