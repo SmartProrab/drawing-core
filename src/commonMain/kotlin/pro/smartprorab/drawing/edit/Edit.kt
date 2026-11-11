@@ -78,7 +78,7 @@ fun Contour.insertVertex(side: Int, t: Double = 0.5): Contour {
     return copy(points = points.toMutableList().apply { add(side + 1, p) })
 }
 
-/** null — удалять нельзя: останется меньше [DrawingLimits.MIN_POINTS] вершин. */
+/** `null` — удалять нельзя: останется меньше [DrawingLimits.MIN_POINTS] вершин. */
 fun Contour.deleteVertex(i: Int): Contour? {
     require(i in points.indices) { "нет вершины $i" }
     if (points.size <= DrawingLimits.MIN_POINTS) return null
