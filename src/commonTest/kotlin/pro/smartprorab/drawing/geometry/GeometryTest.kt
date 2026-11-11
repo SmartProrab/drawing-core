@@ -69,7 +69,7 @@ class GeometryTest {
     }
 
     @Test
-    fun `пустой, одноточечный и двухточечный контуры не падают и дают нулевую площадь`() {
+    fun `пустой · одноточечный и двухточечный контуры не падают и дают нулевую площадь`() {
         val empty = contour()
         val single = contour(100 to 100)
         val segment = contour(0 to 0, 10 to 0)
@@ -84,7 +84,7 @@ class GeometryTest {
     }
 
     @Test
-    fun `площадь, периметр и обход совпадают с ожидаемыми на реальных чертежах`() {
+    fun `площадь · периметр и обход совпадают с ожидаемыми на реальных чертежах`() {
         for (fixture in MeasureFixtures.all) {
             val drawing = decodeFixture(fixture).toDrawing()
             assertEquals(fixture.contours.size, drawing.contours.size, "комната ${fixture.roomId}")
@@ -110,7 +110,7 @@ class GeometryTest {
     }
 
     @Test
-    fun `на границе половины новое правило даёт ровно на 0,1 м² больше старого web`() {
+    fun `на границе половины новое правило даёт ровно на 0·1 м² больше старого web`() {
         val boundary = MeasureFixtures.byTag(FixtureTag.BOUNDARY)
         assertTrue(boundary.isNotEmpty())
         for (fixture in boundary) {

@@ -86,7 +86,7 @@ class EditTest {
     }
 
     @Test
-    fun `DC-MOV-02 угол прямоугольника — x от следующей, y от предыдущей, без сетки`() {
+    fun `DC-MOV-02 угол прямоугольника — x от следующей · y от предыдущей · без сетки`() {
         // от B: 1,1°, к D: 0,8° от вертикали
         val r = square.moveVertex(2, 3_040.3, 3_060.4)
 
@@ -174,7 +174,7 @@ class EditTest {
     }
 
     @Test
-    fun `DC-MOV-03 удаление до трёх вершин, дальше — отказ`() {
+    fun `DC-MOV-03 удаление до трёх вершин · дальше — отказ`() {
         val triangle = square.deleteVertex(2)
 
         assertEquals(contour(0 to 0, 0 to 3_000, 3_000 to 0), triangle)

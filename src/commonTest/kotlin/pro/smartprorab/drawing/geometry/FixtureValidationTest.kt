@@ -18,7 +18,7 @@ class FixtureValidationTest {
     }
 
     @Test
-    fun `DC-FIX-02 вырожденные и пустые открываются, validate их не пропускает`() {
+    fun `DC-FIX-02 вырожденные и пустые открываются · validate их не пропускает`() {
         val bad = contours.filter { (_, _, e) -> !e.savable }
         assertTrue(bad.isNotEmpty())
 
@@ -41,7 +41,7 @@ class FixtureValidationTest {
     }
 
     @Test
-    fun `DC-NORM-01 на фикстурах — по часовой, площадь и периметр не меняются`() {
+    fun `DC-NORM-01 на фикстурах — по часовой · площадь и периметр не меняются`() {
         contours.filter { (_, _, e) -> e.savable }.forEach { (f, c, e) ->
             val n = c.normalized()
             assertTrue(n.twiceSignedAreaMm2() < 0, "room ${f.roomId}")
@@ -61,7 +61,7 @@ class FixtureValidationTest {
     }
 
     @Test
-    fun `сумма внутренних углов — (n − 2) · 180 с точностью округления`() {
+    fun `сумма внутренних углов равна 180 × n−2 с точностью округления`() {
         contours.filter { (_, _, e) -> e.savable }.forEach { (f, c, _) ->
             val n = c.normalized()
             val sum = n.interiorAnglesDeg().sum()

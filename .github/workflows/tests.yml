@@ -1,5 +1,5 @@
 # Тесты общих векторов на jvm (backend), js (web, Node.js) и Android host (мобилка).
-# iOS — вручную или при выпуске: минута macOS-раннера дороже.
+# iOS — отдельной задачей на macOS: Kotlin/Native строже к именам тестов и не проверяется на Linux.
 name: Tests
 
 on:
@@ -73,6 +73,37 @@ jobs:
         uses: mikepenz/action-junit-report@v5
         with:
           check_name: Unit tests
+          report_paths: '**/build/test-results/**/TEST-*.xml'
+          detailed_summary: true
+          include_passed: false
+          require_tests: false
+
+  ios-tests:
+    name: Unit tests (iOS simulator)
+    runs-on: macos-latest
+    timeout-minutes: 40
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Register Kotlin problem matcher
+        run: echo "::add-matcher::.github/matchers/kotlin.json"
+
+      - name: Run iOS tests
+        run: ./gradlew iosSimulatorArm64Test --continue --stacktrace
+
+      - name: Publish test report
+        if: always()
+        uses: mikepenz/action-junit-report@v5
+        with:
+          check_name: Unit tests (iOS)
           report_paths: '**/build/test-results/**/TEST-*.xml'
           detailed_summary: true
           include_passed: false

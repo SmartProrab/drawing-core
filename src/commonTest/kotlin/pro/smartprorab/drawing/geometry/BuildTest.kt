@@ -21,7 +21,7 @@ class BuildTest {
     private val rect = contour(0 to 0, 3_230 to 0, 3_230 to -5_600, 0 to -5_600)
 
     @Test
-    fun `DC-BLD-01 прямоугольник 3230 × 5600, ADJUST — невязок нет`() {
+    fun `DC-BLD-01 прямоугольник 3230 × 5600 · ADJUST — невязок нет`() {
         val r = buildContour(rows(90.0 to 3_230, 90.0 to 5_600, 90.0 to 3_230, 90.0 to 5_600), BuildMode.ADJUST)
 
         assertEquals(rect, r.contour)
