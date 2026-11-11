@@ -7,7 +7,7 @@
     "noEmit": true,
     "skipLibCheck": false,
     "paths": {
-      "@smartprorab/drawing-core": ["../build/dist/js/productionLibrary/drawing-core.mjs"]
+      "@smartprorab/drawing-core": ["../build/dist/js/productionLibrary/drawing-core.d.mts"]
     }
   },
   "files": ["check.ts"]
