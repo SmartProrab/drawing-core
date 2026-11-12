@@ -73,13 +73,13 @@ class ValidationTest {
     }
 
     @Test
-    fun `200 вершин — можно, 201 — нельзя`() {
+    fun `200 вершин — можно · 201 — нельзя`() {
         assertFalse(ContourIssue.TOO_MANY_POINTS in regular(DrawingLimits.MAX_POINTS).validate())
         assertTrue(ContourIssue.TOO_MANY_POINTS in regular(DrawingLimits.MAX_POINTS + 1).validate())
     }
 
     @Test
-    fun `координата на пределе — можно, за пределом — нельзя`() {
+    fun `координата на пределе — можно · за пределом — нельзя`() {
         val max = DrawingLimits.MAX_COORDINATE_MM
         assertEquals(emptySet(), contour(-max to -max, -max to max, max to max, max to -max).validate())
         assertEquals(
@@ -99,7 +99,7 @@ class ValidationTest {
     }
 
     @Test
-    fun `проблемы контуров — по индексу, исправные не попадают`() {
+    fun `проблемы контуров — по индексу · исправные не попадают`() {
         val butterfly = contour(0 to 0, 3_000 to 1_000, 3_000 to 0, 0 to 2_000)
 
         val v = Drawing(listOf(rect, butterfly)).validate()

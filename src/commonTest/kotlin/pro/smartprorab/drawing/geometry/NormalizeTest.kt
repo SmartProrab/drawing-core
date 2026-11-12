@@ -16,7 +16,7 @@ class NormalizeTest {
     private val d = 0 to 5_600
 
     @Test
-    fun `DC-NORM-01 против часовой разворачивается, A остаётся первой`() {
+    fun `DC-NORM-01 против часовой разворачивается · A остаётся первой`() {
         val ccw = contour(a, b, c, d)
 
         val n = ccw.normalized()

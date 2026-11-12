@@ -76,7 +76,7 @@ class MappingTest {
     }
 
     @Test
-    fun `версия проходит без изменений, диагонали SP не переносятся`() {
+    fun `версия проходит без изменений · диагонали SP не переносятся`() {
         val legacy = Measure(points = listOf(listOf(0.0, 0.0), listOf(0.0, 100.0), listOf(100.0, 100.0)), diagonals = listOf("AC"), area = 0.5, perimeter = 3.4)
 
         val contour = legacy.toContour()

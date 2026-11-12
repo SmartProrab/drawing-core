@@ -15,7 +15,7 @@ class MeasurementsTest {
     private val lShapeCw = contour(0 to 0, 0 to 4_000, 2_000 to 4_000, 2_000 to 2_000, 4_000 to 2_000, 4_000 to 0)
 
     @Test
-    fun `подписи вершин — A…Z, AA, AB, …, ZZ, AAA`() {
+    fun `подписи вершин — A…Z · AA · AB · … · ZZ · AAA`() {
         assertEquals("A", vertexLabel(0))
         assertEquals("Z", vertexLabel(25))
         assertEquals("AA", vertexLabel(26))
