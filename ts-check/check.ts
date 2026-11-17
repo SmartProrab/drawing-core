@@ -35,6 +35,13 @@ const deleted = dc.deleteVertex(square, 2)
 const deletedCount: number = deleted == null ? 0 : deleted.length
 const shifted: number[][] = dc.translate(square, 100, -50)
 
+// 0.2.0: несколько уровней
+const levels: number[][][] = [[[0, 0], [0, 3200], [3230, 3200], [3230, 0]], [[0, 3200], [0, 5600], [3230, 5600], [3230, 3200]]]
+const overlaps: number[][] = dc.overlappingContours(levels)
+const transition: number = dc.levelTransitionMm(levels, [1, 2])
+const parts = dc.split(square, [[0, 1500], [3000, 1500]])
+const partsCount: number = parts == null ? 0 : parts.length
+
 // web подключает пакет динамическим импортом только на экране чертежа
 async function lazy(): Promise<number> {
     const lib = await import("@smartprorab/drawing-core")
@@ -43,5 +50,5 @@ async function lazy(): Promise<number> {
 
 export {
     area, perimeter, diagonal, angles, direction, label, issues, normalized, first,
-    builtPoints, misclosure, reversed, movedPoints, snaps, inserted, deletedCount, shifted, lazy,
+    builtPoints, misclosure, reversed, movedPoints, snaps, inserted, deletedCount, shifted, lazy, overlaps, transition, partsCount,
 }
