@@ -4,7 +4,6 @@ import pro.smartprorab.drawing.model.Contour
 import pro.smartprorab.drawing.model.Drawing
 import pro.smartprorab.drawing.model.Point
 import pro.smartprorab.drawing.model.DrawingLimits
-import kotlin.compareTo
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
