@@ -4,6 +4,7 @@ import pro.smartprorab.drawing.model.Contour
 import pro.smartprorab.drawing.model.Drawing
 import pro.smartprorab.drawing.model.Point
 import pro.smartprorab.drawing.model.DrawingLimits
+import kotlin.compareTo
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -21,15 +22,21 @@ fun Contour.validate(): Set<ContourIssue> = buildSet {
 }
 
 
-fun Drawing.validate(): DrawingValidation = DrawingValidation(
-    drawing = buildSet {
-        if (contours.isEmpty()) add(DrawingIssue.NO_CONTOURS)
-        if (contours.size > DrawingLimits.MAX_CONTOURS) add(DrawingIssue.TOO_MANY_CONTOURS)
-    },
-    contours = contours.withIndex()
-        .associate { (i, c) -> i to c.validate() }
-        .filterValues { it.isNotEmpty() }
-)
+fun Drawing.validate(): DrawingValidation {
+    val contourIssues = contours.withIndex().associate { (i, c) -> i to c.validate() }.filterValues { it.isNotEmpty() }
+    val healthy = contours.indices.filter { it !in contourIssues }
+    val overlaps = healthy.flatMap { i -> healthy.filter { it > i }.map { j -> i to j } }
+        .filter { (i, j) -> contours[i].overlaps(contours[j]) }
+    return DrawingValidation(
+        drawing = buildSet {
+            if (contours.isEmpty()) add(DrawingIssue.NO_CONTOURS)
+            if (contours.size > DrawingLimits.MAX_CONTOURS) add(DrawingIssue.TOO_MANY_CONTOURS)
+        },
+        contours = contourIssues,
+        overlaps = overlaps
+    )
+}
+
 
 /**
  * Пересекаются ли несоседние стороны (включая касание в вершине и наложение на одной прямой).
@@ -56,9 +63,6 @@ private fun segmentsIntersect(p1: Point, p2: Point, p3: Point, p4: Point): Boole
     return (d1 == 0 && onSegment(p3, p1, p4)) || (d2 == 0 && onSegment(p3, p2, p4)) ||
             (d3 == 0 && onSegment(p1, p3, p2)) || (d4 == 0 && onSegment(p1, p4, p2))
 }
-
-private fun cross(o: Point, a: Point, b: Point): Long =
-    (a.x - o.x).toLong() * (b.y - o.y) - (a.y - o.y).toLong() * (b.x - o.x)
 
 private fun onSegment(p: Point, q: Point, r: Point): Boolean =
     min(p.x, r.x) <= q.x && q.x <= max(p.x, r.x) && min(p.y, r.y) <= q.y && q.y <= max(p.y, r.y)
