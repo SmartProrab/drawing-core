@@ -1,15 +1,22 @@
-# Выпуск по тегу vX.Y.Z: все цели (iOS собирается только на macOS) → GitHub Packages:
+# Выпуск после мержа в main: версия — libVersion в gradle.properties.
+# Если тега vX.Y.Z ещё нет — тесты на всех целях (iOS только на macOS), публикация в GitHub Packages,
+# затем тег и GitHub Release. Версия не поднята — выпуска нет (тег уже есть).
 #  - Maven: pro.smartprorab:drawing-core:X.Y.Z (jvm, android, ios + метаданные KMP)
 #  - npm:   @smartprorab/drawing-core@X.Y.Z (ES-модуль + .d.ts)
 name: Release
 
 on:
   push:
-    tags: [ 'v*' ]
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # тег и GitHub Release
   packages: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -18,38 +25,64 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Version
+        id: version
+        run: |
+          v=$(sed -n 's/^libVersion=//p' gradle.properties)
+          [ -n "$v" ] || { echo "::error::libVersion не задан в gradle.properties"; exit 1; }
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+          if git rev-parse -q --verify "refs/tags/v$v" >/dev/null; then
+            echo "::notice::v$v уже выпущена — выпуск пропущен"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-java@v5
+        if: steps.version.outputs.skip != 'true'
         with:
           distribution: zulu
           java-version: 21
 
       - uses: gradle/actions/setup-gradle@v4
+        if: steps.version.outputs.skip != 'true'
 
       - uses: actions/setup-node@v5
+        if: steps.version.outputs.skip != 'true'
         with:
           node-version: 22
           registry-url: https://npm.pkg.github.com
           scope: '@smartprorab'
 
-      - name: Version from tag
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-
       - name: Tests on all targets
-        run: ./gradlew allTests -PlibVersion=$VERSION
+        if: steps.version.outputs.skip != 'true'
+        run: ./gradlew allTests
 
       - name: Publish Maven
+        if: steps.version.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository -PlibVersion=$VERSION
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
 
       - name: Publish npm
+        if: steps.version.outputs.skip != 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./gradlew jsBrowserProductionLibraryDistribution -PlibVersion=$VERSION
+          ./gradlew jsBrowserProductionLibraryDistribution
           cd build/dist/js/productionLibrary
           npm pkg set name=@smartprorab/drawing-core version=$VERSION \
             repository.type=git repository.url=https://github.com/SmartProrab/drawing-core.git \
             publishConfig.registry=https://npm.pkg.github.com
+          npm pkg delete devDependencies
           npm publish
+
+      - name: Tag and GitHub Release
+        if: steps.version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag -a "v$VERSION" -m "drawing-core $VERSION"
+          git push origin "v$VERSION"
+          gh release create "v$VERSION" --title "drawing-core $VERSION" --generate-notes

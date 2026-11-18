@@ -50,7 +50,9 @@ dc.deleteVertex([[0, 0], [0, 1000], [1000, 0]], 0)  // null — меньше 3 �
 
 ## Выпуск
 
-Тег `vX.Y.Z` → GitHub Actions публикует в GitHub Packages:
+Версия — `libVersion` в `gradle.properties`. PR, меняющий код библиотеки, поднимает её (проверка `Version bumped`). После мержа в `main` `release.yml` прогоняет тесты на всех целях, публикует в GitHub Packages и ставит тег `vX.Y.Z` с GitHub Release. Версия не поднята — выпуска нет.
+
+Перед push — `scripts/check.sh`: ветка, слитая с `origin/main`, те же шаги, что CI, в отдельной рабочей копии (на macOS — и iOS).
 
 | Потребитель | Артефакт |
 |---|---|
