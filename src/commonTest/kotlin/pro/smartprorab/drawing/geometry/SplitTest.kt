@@ -1,5 +1,6 @@
 package pro.smartprorab.drawing.geometry
 
+import pro.smartprorab.drawing.edit.split
 import pro.smartprorab.drawing.model.Contour
 import pro.smartprorab.drawing.model.Point
 import kotlin.math.hypot

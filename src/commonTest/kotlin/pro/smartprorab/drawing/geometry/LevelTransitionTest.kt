@@ -74,7 +74,7 @@ class LevelTransitionTest {
     }
 
     @Test
-    fun `уровней столько же, сколько контуров`() {
+    fun `уровней столько же сколько контуров`() {
         assertFailsWith<IllegalArgumentException> { levelTransitionMm(listOf(low, high), listOf(1)) }
     }
 }
