@@ -30,6 +30,7 @@ fun Drawing.validate(): DrawingValidation {
         drawing = buildSet {
             if (contours.isEmpty()) add(DrawingIssue.NO_CONTOURS)
             if (contours.size > DrawingLimits.MAX_CONTOURS) add(DrawingIssue.TOO_MANY_CONTOURS)
+            if (overlaps.isNotEmpty()) add(DrawingIssue.CONTOURS_OVERLAP)
         },
         contours = contourIssues,
         overlaps = overlaps
