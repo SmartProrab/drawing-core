@@ -31,6 +31,15 @@ if [ "$merge" = 1 ] && ! git merge-base --is-ancestor origin/main HEAD; then
     || { echo "✗ конфликт с main — обновите ветку"; git diff --name-only --diff-filter=U; exit 1; }
 fi
 
+# local.properties в git нет: путь к Android SDK — из вашей копии, ANDROID_HOME или стандартной папки macOS
+if [ -f "$root/local.properties" ]; then
+  cp "$root/local.properties" local.properties
+elif [ -z "${ANDROID_HOME:-}" ] && [ -d "$HOME/Library/Android/sdk" ]; then
+  echo "sdk.dir=$HOME/Library/Android/sdk" > local.properties
+fi
+[ -f local.properties ] || [ -n "${ANDROID_HOME:-}" ] \
+  || { echo "✗ Android SDK не найден: задайте ANDROID_HOME или sdk.dir в local.properties"; exit 1; }
+
 step "Тесты: jvm, js (Node), Android"
 tasks="jvmTest jsNodeTest testAndroidHostTest jsBrowserProductionLibraryDistribution"
 [ "$(uname)" = "Darwin" ] && tasks="$tasks iosSimulatorArm64Test"
