@@ -91,11 +91,10 @@ class ValidationTest {
     @Test
     fun `чертёж без контуров и со слишком многими контурами`() {
         assertEquals(setOf(DrawingIssue.NO_CONTOURS), Drawing(emptyList()).validate().drawing)
-        assertEquals(emptySet(), Drawing(List(DrawingLimits.MAX_CONTOURS) { rect }).validate().drawing)
-        assertEquals(
-            setOf(DrawingIssue.TOO_MANY_CONTOURS),
-            Drawing(List(DrawingLimits.MAX_CONTOURS + 1) { rect }).validate().drawing,
-        )
+        // контуры в ряд, без перекрытия: с 0.2.0 одинаковые контуры друг на друге — CONTOURS_OVERLAP
+        fun row(n: Int) = Drawing(List(n) { i -> Contour(rect.points.map { Point(it.x + i * 4_000, it.y) }) })
+        assertEquals(emptySet(), row(DrawingLimits.MAX_CONTOURS).validate().drawing)
+        assertEquals(setOf(DrawingIssue.TOO_MANY_CONTOURS), row(DrawingLimits.MAX_CONTOURS + 1).validate().drawing)
     }
 
     @Test

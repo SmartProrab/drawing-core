@@ -18,6 +18,25 @@ permissions:
   pull-requests: write
 
 jobs:
+  version:
+    name: Version bumped
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      # Код библиотеки изменён — libVersion должна быть новой: после мержа release.yml её выпустит
+      - name: libVersion not yet released
+        run: |
+          v=$(sed -n 's/^libVersion=//p' gradle.properties)
+          changed=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- src/commonMain src/jsMain src/androidMain src/iosMain | head -1)
+          if [ -n "$changed" ] && git rev-parse -q --verify "refs/tags/v$v" >/dev/null; then
+            echo "::error file=gradle.properties::v$v уже выпущена, а код библиотеки изменён — поднимите libVersion"
+            exit 1
+          fi
+          echo "libVersion=$v"
+
   unit-tests:
     name: Unit tests (jvm, js, Android host)
     runs-on: ubuntu-latest

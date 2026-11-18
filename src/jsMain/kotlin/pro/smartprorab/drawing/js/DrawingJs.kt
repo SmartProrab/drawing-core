@@ -7,6 +7,7 @@ import pro.smartprorab.drawing.edit.SnapOptions
 import pro.smartprorab.drawing.edit.deleteVertex
 import pro.smartprorab.drawing.edit.insertVertex
 import pro.smartprorab.drawing.edit.moveVertex
+import pro.smartprorab.drawing.edit.split
 import pro.smartprorab.drawing.edit.translate
 import pro.smartprorab.drawing.geometry.BuildMode
 import pro.smartprorab.drawing.geometry.SideInput
@@ -22,6 +23,7 @@ import pro.smartprorab.drawing.geometry.sidesAndAngles
 import pro.smartprorab.drawing.geometry.validate
 import pro.smartprorab.drawing.geometry.vertexLabel
 import pro.smartprorab.drawing.model.Contour
+import pro.smartprorab.drawing.model.Drawing
 import pro.smartprorab.drawing.model.Point
 import kotlin.math.roundToInt
 
@@ -95,3 +97,17 @@ private fun Contour.toJs(): Array<Array<Int>> = points.map { arrayOf(it.x, it.y)
 
 private fun Array<Array<Double>>.toInputs(): List<SideInput> =
     map { (angle, length) -> SideInput(angle, length.roundToInt()) }
+
+// --- 0.2.0: несколько уровней ---
+
+/** Пары индексов перекрывающихся контуров [[i, j], …]; неисправные контуры не проверяются. */
+fun overlappingContours(contours: Array<Array<Array<Int>>>): Array<Array<Int>> =
+    Drawing(contours.map { it.toContour() }).validate().overlaps
+        .map { (i, j) -> arrayOf(i, j) }.toTypedArray()
+
+fun levelTransitionMm(contours: Array<Array<Array<Int>>>, levels: Array<Int>): Int =
+    pro.smartprorab.drawing.geometry.levelTransitionMm(contours.map { it.toContour() }, levels.toList())
+
+/** Две части [[…], […]] или null — линия не делит контур. */
+fun split(points: Array<Array<Int>>, cut: Array<Array<Int>>): Array<Array<Array<Int>>>? =
+    points.toContour().split(cut.map { (x, y) -> Point(x, y) })?.let { (a, b) -> arrayOf(a.toJs(), b.toJs()) }
