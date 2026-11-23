@@ -1,3 +1,5 @@
+@file:Suppress("NonAsciiCharacters")
+
 package pro.smartprorab.drawing.edit
 
 import pro.smartprorab.drawing.geometry.areaTenthsM2
@@ -19,7 +21,7 @@ class MirrorTest {
     private val l = contour(0 to 0, 0 to 5_000, 2_000 to 5_000, 2_000 to 2_000, 4_000 to 2_000, 4_000 to 0)
 
     @Test
-    fun `Г-образный контур отражается в пределах своего габарита, обход по часовой, A — образ прежней A`() {
+    fun `Г-образный контур отражается в пределах своего габарита обход по часовой A — образ прежней A`() {
         val m = l.mirrored()
 
         assertEquals(
@@ -46,7 +48,7 @@ class MirrorTest {
     }
 
     @Test
-    fun `дважды - исходный чертёж, пустой - без изменений`() {
+    fun `дважды - исходный чертёж пустой - без изменений`() {
         assertEquals(l, l.mirrored().mirrored())
         assertEquals(Drawing(emptyList()), Drawing(emptyList()).mirrored())
     }
