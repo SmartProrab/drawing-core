@@ -42,6 +42,9 @@ const transition: number = dc.levelTransitionMm(levels, [1, 2])
 const parts = dc.split(square, [[0, 1500], [3000, 1500]])
 const partsCount: number = parts == null ? 0 : parts.length
 
+// 0.3.0: зеркало
+const mirrored: number[][][] = dc.mirror(levels)
+
 // web подключает пакет динамическим импортом только на экране чертежа
 async function lazy(): Promise<number> {
     const lib = await import("@smartprorab/drawing-core")
@@ -50,5 +53,5 @@ async function lazy(): Promise<number> {
 
 export {
     area, perimeter, diagonal, angles, direction, label, issues, normalized, first,
-    builtPoints, misclosure, reversed, movedPoints, snaps, inserted, deletedCount, shifted, lazy, overlaps, transition, partsCount,
+    builtPoints, misclosure, reversed, movedPoints, snaps, inserted, deletedCount, shifted, lazy, overlaps, transition, partsCount, mirrored,
 }

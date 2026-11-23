@@ -7,6 +7,7 @@ import pro.smartprorab.drawing.edit.SnapOptions
 import pro.smartprorab.drawing.edit.deleteVertex
 import pro.smartprorab.drawing.edit.insertVertex
 import pro.smartprorab.drawing.edit.moveVertex
+import pro.smartprorab.drawing.edit.mirrored
 import pro.smartprorab.drawing.edit.split
 import pro.smartprorab.drawing.edit.translate
 import pro.smartprorab.drawing.geometry.BuildMode
@@ -111,3 +112,9 @@ fun levelTransitionMm(contours: Array<Array<Array<Int>>>, levels: Array<Int>): I
 /** Две части [[…], […]] или null — линия не делит контур. */
 fun split(points: Array<Array<Int>>, cut: Array<Array<Int>>): Array<Array<Array<Int>>>? =
     points.toContour().split(cut.map { (x, y) -> Point(x, y) })?.let { (a, b) -> arrayOf(a.toJs(), b.toJs()) }
+
+// --- 0.3.0: зеркало ---
+
+/** Контуры, отражённые вместе по вертикальной оси через середину общего габарита; порядок тот же, обход по часовой. */
+fun mirror(contours: Array<Array<Array<Int>>>): Array<Array<Array<Int>>> =
+    Drawing(contours.map { it.toContour() }).mirrored().contours.map { it.toJs() }.toTypedArray()

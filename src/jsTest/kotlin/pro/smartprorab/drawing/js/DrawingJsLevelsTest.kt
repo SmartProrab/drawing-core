@@ -41,4 +41,13 @@ class DrawingJsLevelsTest {
 
         assertNull(split(rect(0, 0, 4_000, 3_000), arrayOf(arrayOf(0, 1_000), arrayOf(1_500, 1_000))))
     }
+
+    @Test
+    fun `mirror — контуры отражаются вместе, порядок тот же`() {
+        val m = mirror(arrayOf(rect(0, 0, 1_000, 3_200), rect(1_000, 0, 3_230, 3_200)))
+
+        assertEquals(listOf(3_230, 0, 3_230, 3_200, 2_230, 3_200, 2_230, 0).sorted(), m[0].flat().sorted())
+        assertEquals(arrayOf(3_230, 0).toList(), m[0][0].toList())
+        assertEquals(2, m.size)
+    }
 }
